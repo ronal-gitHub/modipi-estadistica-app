@@ -20,7 +20,7 @@
         />
 
         <div class="display-3">
-          <img src="/img/digemig-logo-corner.png" width="28%">
+          <img src="/img/mjti-logo-corner.png" width="28%">
         </div>        
       </div>
       <app-navbar-actions

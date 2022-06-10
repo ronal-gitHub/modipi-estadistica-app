@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
     email: DataTypes.STRING,
     reset_key: DataTypes.STRING,
     puesto_id:DataTypes.INTEGER            ,
-  }, {schema: 'dgm_scg_test',});
+  }, {schema: 'modipi_test',});
   User.beforeSave((user, options) => {
   //  console.log(user.changed('password_hash'));
     if (user.changed('password_hash')) {

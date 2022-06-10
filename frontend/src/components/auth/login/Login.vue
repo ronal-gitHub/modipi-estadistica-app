@@ -94,7 +94,7 @@ export default {
               localStorage.token = response.data.token
               localStorage.uid = response.data.login
               //response.data.email.slice(0, response.data.email.indexOf('@'))
-              this.$router.replace('/admin/page01')
+              this.$router.replace('/admin/ine-snie')
             }
           })
 
@@ -127,7 +127,7 @@ export default {
           .post('/check_token/', ddd, { 'headers': { 'Authorization': localStorage.token } })
           .then((response) => {
             if (response.data.invalid != 1) {
-              this.$router.replace('/admin/page01')
+              this.$router.replace('/admin/ine-snie')
             }
           })
           .catch((error) => {

@@ -76,9 +76,9 @@ export default new Router({
       component: AppLayout,
       children: [
         {
-          name: 'page01',
-          path: 'page01',
-          component: () => import('../components/views/page01.vue'),
+          name: 'ine-snie',
+          path: 'ine-snie',
+          component: () => import('../components/views/ine-snie.vue'),
           default: true,
         },
         {

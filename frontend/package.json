@@ -25,6 +25,7 @@
     "detect-browser": "^4.8.0",
     "element-resize-detector": "^1.1.15",
     "epic-spinners": "^1.1.0",
+    "exceljs": "^4.3.0",
     "extend": "3.0.2",
     "flag-icon-css": "^3.4.5",
     "font-awesome": "^4.7.0",
@@ -56,7 +57,8 @@
     "vuetable-2": "^1.7.5",
     "vuex": "^3.1.2",
     "vuex-i18n": "^1.13.1",
-    "vuex-router-sync": "^5.0.0"
+    "vuex-router-sync": "^5.0.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.5.17",

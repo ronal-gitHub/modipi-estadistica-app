@@ -1,17 +1,59 @@
 export const getVerticalBarChartData = (themes) => ({
-  labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+  labels: ['Total','Vivienda Particular',	'Vivienda Colectiva',	'Transeuntes'],
   datasets: [
+      {
+          label: 'Chuquisaca',
+    backgroundColor: themes.primary,
+          borderColor: 'transparent',
+          data: [179578,	176450,	2277,	851  ],
+      },
+  {
+          label: 'La Paz',
+    backgroundColor: themes.primary,
+          borderColor: 'transparent',
+          data:  [940948,	930457,	7197,	3294  ]
+      },   
     {
-      label: 'USA',
-      backgroundColor: themes.primary,
-      borderColor: 'transparent',
-      data: [50, 20, 12, 39, 10, 40, 39, 80, 40, 20, 12, 11],
-    },
+          label: 'Cochabamba',
+    backgroundColor: themes.primary,
+          borderColor: 'transparent',
+          data: [179578,	176450,	2277,	2317  ],
+      },
+  {
+          label: 'Oruro',
+    backgroundColor: themes.primary,
+          borderColor: 'transparent',
+          data:  [940948,	930457,	7197,	756  ]
+      },  
+   {
+          label: 'Potosí',
+    backgroundColor: themes.primary,
+          borderColor: 'transparent',
+          data: [179578,	176450,	2277,	1225  ],
+      },
+  {
+          label: 'Tarija',
+    backgroundColor: themes.primary,
+          borderColor: 'transparent',
+          data:  [940948,	930457,	7197,	801  ]
+      },  
+   {
+          label: 'Santa Cruz',
+    backgroundColor: themes.primary,
+          borderColor: 'transparent',
+          data: [179578,	176450,	2277,	2898  ],
+      },
+  {
+          label: 'Beni',
+    backgroundColor: themes.primary,
+          borderColor: 'transparent',
+          data:  [940948,	930457,	7197,	631  ]
+      },  
     {
-      label: 'USSR',
-      backgroundColor: themes.info,
-      borderColor: 'transparent',
-      data: [50, 10, 22, 39, 15, 20, 85, 32, 60, 50, 20, 30],
-    },
+          label: 'Pando',
+    backgroundColor: themes.primary,
+          borderColor: 'transparent',
+          data:  [28296,	27415,	683,	198  ]
+      },
   ],
 })

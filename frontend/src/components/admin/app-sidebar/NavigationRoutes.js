@@ -5,11 +5,56 @@ export const navigationRoutes = {
   },
   routes: [
     {
-      name: 'page01',
-      displayName: 'Busqueda',
+      name: 'ine-snie',
+      displayName: 'INE-SNIE',
       meta: {
-        iconClass: 'va-icon entypo entypo-users',
+        iconClass: 'vuestic-iconset vuestic-iconset-statistics',
       },
+      disabled: true,
+      children: [
+        {
+          name: 'ine-snie',
+          displayName: 'INE-SNIE',
+        },
+        {
+          name: 'min-education',
+          displayName: 'Min. de Educación',
+        },
+        {
+          name: 'min-salud',
+          displayName: 'Min. de Salud',
+        },
+        {
+          name: 'sereci',
+          displayName: 'SERECI',
+        },
+      ],
+    },
+    {
+      name: 'mit-sinna-modefa',
+      displayName: 'MIT-SINNA,MODEFA',
+      meta: {
+        iconClass: 'vuestic-iconset vuestic-iconset-statistics',
+      },
+      disabled: true,
+      children: [
+        {
+          name: 'mit-sinna-modefa',
+          displayName: 'MIT-SINNA,MODEFA',
+        },
+        {
+          name: 'min-economia',
+          displayName: 'Min. Economia',
+        },
+        {
+          name: 'organo-judicial',
+          displayName: 'Órgano judicial',
+        },
+        {
+          name: 'cruce-varibles',
+          displayName: 'Cruce de varibles',
+        },
+      ],
     },
     {
       name: 'logout',

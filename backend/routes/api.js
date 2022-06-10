@@ -9,7 +9,7 @@ const router = express.Router();
 // require('../config/passport')(passport);
 // rbc const Product = require('../models').Products; //rbc se cambio por tramites
 const User = require('../models').usuario;
-const DetailDB = require('../models').inf_tramite;
+const DetailDB = require('../models').estidistica;
 //const DetailDB2 = require('../models').sync_log;
 //onst Sequelize = require('sequelize'); 
 
@@ -67,103 +67,47 @@ router.post('/signin', function (req, res) {
 });
 
 
-// Endpoint Consulta flujos migratorios desde la tabla inf_tramite
-router.get('/flujoXX', function (req, res) {
-    console.log("=======");
-    console.log(req.url);
-    console.log("=======");
-   // console.log(req.query.nroDoc);
-    // var token = getToken(req.headers);
-    // if (token) {
-      
-      DetailDB
-            .findAll({             
-            })
-            .then((tramites) => { // rbc era prods
-                var temp = tramites.filter(item =>  item.numero_doc.toString().includes(req.query.nroDoc.toString())
-                    && (item.nombres_apellidos.toString().toLowerCase().includes(req.query.nombres.toString().toLowerCase()) 
-                    && item.nombres_apellidos.toLowerCase().includes(req.query.apellidos.toString().toLowerCase()))
-                    && moment(item.fecha_nac).format('DD/MM/YYYY').toString().includes(req.query.fechaNac.toString())
-                );
-                    console.log( JSON.stringify(tramites));     //
-     //   console.log(tramites);                   
-             
-                if(req.query.gestionReg == 'TODOS')
-                    res.status(200).send(temp);
-                else
-                    res.status(200).send(temp.filter(item => req.query.fechaReg.toString().includes(item.fecha_reg.getFullYear().toString())));
-            })
-            .catch((error) => {
-                 res.status(400).send(error);
-              });
-    // } else {
-    //     return res.status(403).send({ success: false, msg: 'Unauthorized.' });
-    // }
- // });
-});
+// Consulta estidisticas mediante su id y titulo
 
 
-router.get  ('/flujo', async function (req, res)   {  /// getAllFlujo
+router.get  ('/indicador', async function (req, res)   {
   try { //  The variable that received the HTTP data had to use the await keyword to ensure the asynchronous data was received before continuing
-    var token = getToken(req.headers);
+   // var token = getToken(req.headers);
+ console.log(req.headers);
 
-     if (token) {
+     if (true) {
       // Verify the token using jwt.verify method
-      const decode =   jwt.verify(token, 'nodeauthsecret');
+    //  const decode =   jwt.verify(token, 'nodeauthsecret');
 
-    const wsExterno = await    wsExternos(); // llamda a ws wxternos ej INTERPOL
+  //  const wsExterno = await    wsExternos(); // llamda a ws wxternos ej INTERPOL
      
       // Use raw SQL queries to select all rows which belongs to the tramite_inf
      // console.log(req.url);  // [results, metadata]
    
-      const results = await DetailDB.sequelize.query(" WITH inf_tram_conbinado AS (  "+
-            "     SELECT numero_doc, nombres_apellidos, nombres,apellidos, fecha_nac, par_tramite, id_tramite, serie, pais_nac, tipo_doc,	 "+
-            "         fecha_exp, fecha_emi, lugar_emision, estado, observacion , fecha_reg 	 "+
-            "       FROM dgm_scg_test.inf_tramite inf  "+
-            "                WHERE ( numero_doc iLIKE '%'||  COALESCE(NULLIF(:nro_doc :: text, ''), numero_doc) || '%' 	 "+
-            "AND (nombres_apellidos iLIKE  '%'||  COALESCE(NULLIF(:nom_apellidos :: text, ''), nombres_apellidos) || '%' ) 	 "+
-            "AND nombres iLIKE '%'||  COALESCE(NULLIF(:nombres :: text, ''), nombres) || '%'  AND apellidos iLIKE '%'||  COALESCE(NULLIF(:apellidos :: text, ''), apellidos) || '%' ) 	 "+
-            "AND   TO_CHAR(fecha_nac, 'DD/MM/YYYY') = COALESCE(NULLIF(:fecha_nac :: text, ''), TO_CHAR(fecha_nac, 'DD/MM/YYYY') ) 	 "+
-            "AND Extract(year FROM fecha_reg) ::text = COALESCE(NULLIF(:gestion_reg :: text, 'TODOS'), Extract(year FROM fecha_reg)::text)  	 "+
-            "   UNION   "+
-            "           SELECT numero_doc, nombres_apellidos, nombres,apellidos, fecha_nac, par_tramite, id_tramite, serie, pais_nac, tipo_doc, 	 "+
-            "       fecha_exp, fecha_emi, lugar_emision, estado, observacion, fecha_reg    "+
-            "         FROM dgm_scg_test.inf_tramite inf 	 "+
-            "WHERE numero_doc iLIKE '%'||  COALESCE(NULLIF(:nro_doc :: text, ''), numero_doc) || '%'  	 "+          
-            "AND nombres iLIKE '%'||  COALESCE(NULLIF(:nombres :: text, ''), 'x') || '%'  AND apellidos   iLIKE '%'||  COALESCE(NULLIF(:apellidos :: text, ''), 'x') || '%'  	 "+
-            "AND   TO_CHAR(fecha_nac, 'DD/MM/YYYY') = COALESCE(NULLIF(:fecha_nac :: text, ''), TO_CHAR(fecha_nac, 'DD/MM/YYYY') ) 	 "+
-            "AND Extract(year from fecha_reg) ::text = COALESCE(NULLIF(:gestion_reg :: text, 'TODOS'), Extract(year FROM fecha_reg)::text)           "+
-            "   UNION 	 "+
-            "        SELECT numero_doc, nombres_apellidos, nombres,apellidos, fecha_nac, par_tramite, id_tramite, serie, pais_nac, tipo_doc,  "+
-            "         fecha_exp, fecha_emi, lugar_emision, estado, observacion 	, fecha_reg   "+
-            "       FROM dgm_scg_test.inf_tramite inf   "+
-            "         WHERE  numero_doc iLIKE '%'||  COALESCE(NULLIF(:nro_doc :: text, ''), numero_doc) || '%'  	 "+    
-            "AND nombres iLIKE '%'||  COALESCE(NULLIF(:nombres :: text, ''), nombres) || '%'  AND  apellidos iLIKE '%'||  COALESCE(NULLIF(:apellidos :: text, ''), 'x') || '%'  	 "+
-            "AND   TO_CHAR(fecha_nac, 'DD/MM/YYYY') = COALESCE(NULLIF(:fecha_nac :: text, ''), TO_CHAR(fecha_nac, 'DD/MM/YYYY') )	 "+
-            "AND Extract(year from fecha_reg) ::text = COALESCE(NULLIF(:gestion_reg :: text, 'TODOS'), Extract(year FROM fecha_reg)::text) ),  "+
-            "   usu_roles_conbinado AS (          "+
-            "   SELECT rol.usuario_id, rol.modulo_sigla , tipo.codigo  FROM  dgm_scg_test.usuario usu, dgm_scg_test.modulo_tipo tipo ,dgm_scg_test.usuario_rol rol  "+
-            "    where    usu.login = :login :: text and usu.id = rol.usuario_id and tipo.sigla = rol.modulo_sigla  and  usu.status = 'ACTIVO'    )  "+
-            " SELECT id_tramite,mo.modulo_sigla,   nombres_apellidos, fecha_nac, numero_doc,       tipo_doc, pais_nac, serie, fecha_emi, "+
-            "   fecha_exp, lugar_emision,  estado, observacion, fecha_reg  , par_tramite         "+
-            "   FROM  inf_tram_conbinado inf , usu_roles_conbinado mo      "+
-            "   WHERE   inf.par_tramite =   mo.codigo     "+
-            "   ORDER BY numero_doc DESC   LIMIT 100  ",         
-      
-            {
-              replacements: { nro_doc:  req.query.nroDoc , nom_apellidos:  req.query.nomApellidos    
-                ,nombres:  req.query.nombres, apellidos: req.query.apellidos  
-                ,fecha_nac:  req.query.fechaNac , gestion_reg:  req.query.gestionReg ,login:  req.query.login              
-            },
-              type: DetailDB.sequelize.QueryTypes.SELECT
-          });  // bind: {status}
+     const results = await DetailDB.sequelize.query(  
+        "	 WITH estadistica_json AS (	"+
+"	SELECT  sec::numeric , filas ,filas->>'B' col_B , filas->>'C' col_C  ,filas->>'E' col_E ,filas->>'F' col_F  ,filas->>'G' col_G , filas->>'H' col_H, filas->>'I' col_I, filas->>'J' col_J, filas->>'K' col_K, filas->>'L' col_L from (	"+
+"	 select   (json_array_elements (payload_json::json->'arr') ->>'A') as sec, json_array_elements (payload_json::json->'arr')as filas  	"+
+"	  FROM modipi_test.estadistica where   status = 'ACTIVO' AND indicador_id= 1) as subqry /* :id_indic */	"+
+"	   )  	"+
+"	 , titulo_json AS  (select sec FROM estadistica_json  where    filas->>'B' = 'NÚMERO DE VIVENDAS POR TIPO DE VIVIENDA, SEGÚN  DEPARTAMENTO, PROVINCIA Y MUNICIPIO, CNPV 2012'  ) 	"+
+"	 , titulo_fin_json AS  (select sec  FROM estadistica_json where    sec >= (select sec  from titulo_json) and  filas->>'B' = 'Fuente: Instituto Nacional de Estadistica' ORDER BY sec ASC FETCH FIRST ROW ONLY  )	"+
+"	 , set_data_json as (select sec,  col_B, col_C, col_E, col_F ,  col_G ,  col_H,  col_I,  col_J,col_K,col_L , 'themes.primary' backgroundColor,  'transparent' borderColor  FROM estadistica_json est1      where sec BETWEEN  (select sec  from titulo_json) AND   (select sec  from titulo_FIN_json) )	"+
+"	, estadistica_cols_tit as (select (array[ col_F , col_G ,  col_H,  col_I,col_J,col_K,col_L  ]) labels  from set_data_json WHERE col_F in ('Total') group by sec ,col_C,col_F,  col_G ,  col_H,  col_I,col_J,col_K,col_L order by sec  ) 	"+
+"	 , estadistica_cols_dep as (select col_C as label,(array[ col_F::NUMERIC , col_G::NUMERIC ,  col_H::NUMERIC ,  col_I::NUMERIC, col_J::NUMERIC,col_K::NUMERIC,col_L::NUMERIC   ]) as data , backgroundColor, borderColor from set_data_json WHERE col_C in ('La Paz','Chuquisaca','Cochabamba','Oruro','Potosi','Tarija','Santa Cruz','Beni','Pando') group by sec ,col_C, col_G , col_F, col_H,  col_I,col_J,col_K,col_L ,backgroundColor,borderColor order by sec  )	"+
+"	 , estadistica_cols_mun as (select col_E as label,(array[ col_F::NUMERIC , col_G::NUMERIC ,  col_H::NUMERIC ,  col_I::NUMERIC,  col_J::NUMERIC,col_K::NUMERIC,col_L::NUMERIC  ]) as data , backgroundColor, borderColor from set_data_json WHERE col_E in ('Yotala') group by sec ,col_E,col_F,col_G,col_H,col_I,col_J,col_K,col_L ,backgroundColor,borderColor order by sec  )	"+
+"	 SELECT label,REPLACE (data::TEXT,',NULL','' ) AS data,	backgroundcolor,	bordercolor FROM estadistica_cols_dep 	",
+       {
+             
+             type: DetailDB.sequelize.QueryTypes.SELECT
+         });  // bind: {status}
 
           console.log("===**+**====");     
          // console.log(typeof wsExterno) ; // object 
          // console.log(wsExterno);
           console.log(typeof results) ; 
           console.log(results);
-        results.push(wsExterno);
+       // results.push(wsExterno);
     
        return  res.status(200).send(results);    // res.json({ success: true, email: req.query.nroDoc });
       } else {
@@ -171,7 +115,7 @@ router.get  ('/flujo', async function (req, res)   {  /// getAllFlujo
      }
      }catch (error) {
        console.log("===2====");
-       console.log((res.json({error:error.message})));
+      // console.log((res.json({error:error.message})));
        return res.json({error:error.message});
       }
 

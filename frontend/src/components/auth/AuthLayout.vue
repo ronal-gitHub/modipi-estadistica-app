@@ -22,7 +22,7 @@
           </router-link>
 
         </va-card>
-        <img src="/img/portal-digemig.png" width="28%">
+        <img src="/img/portal-mjti.png" width="28%">
       </div>
     </div>
   </div>
