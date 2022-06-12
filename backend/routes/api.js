@@ -83,8 +83,26 @@ router.get  ('/indicador', async function (req, res)   {
      
       // Use raw SQL queries to select all rows which belongs to the tramite_inf
      // console.log(req.url);  // [results, metadata]
-   
-     const results = await DetailDB.sequelize.query(  
+     let results = await DetailDB.sequelize.query(  
+        "	 WITH estadistica_json AS (	"+
+"	SELECT  sec::numeric , filas ,filas->>'B' col_B , filas->>'C' col_C  ,filas->>'E' col_E ,filas->>'F' col_F  ,filas->>'G' col_G , filas->>'H' col_H, filas->>'I' col_I, filas->>'J' col_J, filas->>'K' col_K, filas->>'L' col_L from (	"+
+"	 select   (json_array_elements (payload_json::json->'arr') ->>'A') as sec, json_array_elements (payload_json::json->'arr')as filas  	"+
+"	  FROM modipi_test.estadistica where   status = 'ACTIVO' AND indicador_id= 1) as subqry /* :id_indic */	"+
+"	   )  	"+
+"	 , titulo_json AS  (select sec FROM estadistica_json  where    filas->>'B' = 'NÚMERO DE VIVENDAS POR TIPO DE VIVIENDA, SEGÚN  DEPARTAMENTO, PROVINCIA Y MUNICIPIO, CNPV 2012'  ) 	"+
+"	 , titulo_fin_json AS  (select sec  FROM estadistica_json where    sec >= (select sec  from titulo_json) and  filas->>'B' = 'Fuente: Instituto Nacional de Estadistica' ORDER BY sec ASC FETCH FIRST ROW ONLY  )	"+
+"	 , set_data_json as (select sec,  col_B, col_C, col_E, col_F ,  col_G ,  col_H,  col_I,  col_J,col_K,col_L , 'themes.primary' backgroundColor,  'transparent' borderColor  FROM estadistica_json est1      where sec BETWEEN  (select sec  from titulo_json) AND   (select sec  from titulo_FIN_json) )	"+
+"	, estadistica_cols_tit as (select (array[ col_F , col_G ,  col_H,  col_I,col_J,col_K,col_L  ]) labels  from set_data_json WHERE col_F in ('Total') group by sec ,col_C,col_F,  col_G ,  col_H,  col_I,col_J,col_K,col_L order by sec  ) 	"+
+"	 , estadistica_cols_dep as (select col_C as label,(array[ col_F::NUMERIC , col_G::NUMERIC ,  col_H::NUMERIC ,  col_I::NUMERIC, col_J::NUMERIC,col_K::NUMERIC,col_L::NUMERIC   ]) as data , backgroundColor, borderColor from set_data_json WHERE col_C in ('La Paz','Chuquisaca','Cochabamba','Oruro','Potosi','Tarija','Santa Cruz','Beni','Pando') group by sec ,col_C, col_G , col_F, col_H,  col_I,col_J,col_K,col_L ,backgroundColor,borderColor order by sec  )	"+
+"	 , estadistica_cols_mun as (select col_E as label,(array[ col_F::NUMERIC , col_G::NUMERIC ,  col_H::NUMERIC ,  col_I::NUMERIC,  col_J::NUMERIC,col_K::NUMERIC,col_L::NUMERIC  ]) as data , backgroundColor, borderColor from set_data_json WHERE col_E in ('Yotala') group by sec ,col_E,col_F,col_G,col_H,col_I,col_J,col_K,col_L ,backgroundColor,borderColor order by sec  )	"+
+"	  SELECT labels FROM  estadistica_cols_tit 	",
+       {
+             
+             type: DetailDB.sequelize.QueryTypes.SELECT
+         });  // bind: {status}
+
+
+     const results_det = await DetailDB.sequelize.query(  
         "	 WITH estadistica_json AS (	"+
 "	SELECT  sec::numeric , filas ,filas->>'B' col_B , filas->>'C' col_C  ,filas->>'E' col_E ,filas->>'F' col_F  ,filas->>'G' col_G , filas->>'H' col_H, filas->>'I' col_I, filas->>'J' col_J, filas->>'K' col_K, filas->>'L' col_L from (	"+
 "	 select   (json_array_elements (payload_json::json->'arr') ->>'A') as sec, json_array_elements (payload_json::json->'arr')as filas  	"+
@@ -105,10 +123,10 @@ router.get  ('/indicador', async function (req, res)   {
           console.log("===**+**====");     
          // console.log(typeof wsExterno) ; // object 
          // console.log(wsExterno);
-          console.log(typeof results) ; 
-          console.log(results);
-       // results.push(wsExterno);
-    
+          console.log(typeof results_det) ; 
+         // console.log(results_det);
+        results.push(results_det);
+         console.log(results);
        return  res.status(200).send(results);    // res.json({ success: true, email: req.query.nroDoc });
       } else {
          return res.status(403).send({ success: false, msg: 'Unauthorized.' });
@@ -128,6 +146,199 @@ router.get  ('/indicador', async function (req, res)   {
        const obj = user.toJSON();
        obj.recentMessage = messagesMap.get(obj.id);
        return obj;*/
+
+       router.get  ('/paramsCboVisible', async function (req, res)   {
+        try { //  The variable that received the HTTP data had to use the await keyword to ensure the asynchronous data was received before continuing
+         // var token = getToken(req.headers);
+       console.log(req.headers);
+      
+           if (true) {
+            // Verify the token using jwt.verify method
+          //  const decode =   jwt.verify(token, 'nodeauthsecret');
+      
+         
+           const results =  {arr:[
+            {
+                  label: "Departamento",
+                  data: ["DPTO_CH:huquisica","DPTO_LP:La Paz"],
+                  index_data: 1,
+                  position_cbo_cbo: 1,
+                  enable: "false",
+                  visible:"true",
+                  level: "Departamento",
+                  father_cbo: ""
+              },
+            {
+                  label: "Municipio",
+                  data: ["DPTO_CH:Sucre","DPTO_CH:Tolata","DPTO_LP:Murillo","DPTO_LP:El Alto"],
+                  index_data: 1,
+                  position_cbo: 2,
+                  enable: "false",
+                  visible:"true",
+                  level: "Municipio",
+                  father_cbo: "Departamento"
+              },
+              {
+                  label: "Grupo etareo",
+                  data: ["GRP_1_TODO:RANGO DE 0 A 99 AÑOS CUMPLIDOS","GRP_0_1_AÑOS:RANGO DE 1 MES A 11.9 MESES CUMPLIDOS"],
+                  index_data: 1,
+                  position_cbo: 3,
+                  enable: "true",
+                  visible:"true",
+                  level: "Municipio",
+                  father_cbo: "Inicador"
+              },
+                {
+                  label: "Edad desde",
+                  data: ["GRP_1_TODO:0 años", "GRP_0_1_AÑOS:0 meses"],
+                  index_data: 1,
+                  position_cbo: 4,
+                  enable: "true",
+                  visible:"true",
+                  level: "Municipio",
+                  father_cbo: "Grupo etareo"
+              }, 
+                {
+                  label: "Edad hasta",
+                  data: ["GRP_1_TODO:99 años","GRP_0_1_AÑOS:11.9 meses"],
+                  index_data: 1,
+                  position_cbo: 5,
+                  enable: "true",
+                  visible:"true",
+                  level: "Municipio",
+                  father_cbo: "Grupo etareo"
+              }, 	
+            {
+                  label: "genero",
+                  data: ["A-AMBOS","M-MASCULINO","F-FEMENINO"],
+                  index_data: 1,
+                  position_cbo: 6,
+                  enable: "true",
+                  visible:"true",
+                  level: "Municipio",
+                  father_cbo: "Indicador"
+              }, 
+              {
+                  label: "Riesgo",
+                  data: ["ALTO", "MEDIO"],
+                  index_data: 2,
+                  position_cbo: 7,
+                  enable: "true",
+                  visible:"true",
+                  level: "Municipio",
+                  father_cbo: "Indicador"
+              },
+            {
+                  label: "Periodo de tiempo",
+                  data: ["ANUAL","SEMESTRAL-1","SEMESTRAL-2","TRIMESTRAL-1"],
+                  index_data: 1,
+                  position_cbo: 8,
+                  enable: "true",
+                  visible:"true",
+                  level: "Municipio",
+                  father_cbo: "Indicador"
+              },
+              {
+                  label: "Fecha desde",
+                  data: ["ANUAL:01/01/2019","SEMESTRAL-1:01/01/2019","SEMESTRAL-2:01/07/2019"],
+                  position_cbo: 9,
+                  enable: "false",
+                  visible:"true",
+                  level: "Municipio",
+                  father_cbo: "Periodo de tiempo"
+              }, 
+                {
+                  label: "Fecha hasta",
+                  data: ["ANUAL:31/12/2019","SEMESTRAL-1:30/06/2019","SEMESTRAL-2:31/12/2019"],
+                  position_cbo: 10,
+                  enable: "false",
+                  visible:"true",
+                  level: "Municipio",
+                  father_cbo: "Periodo de tiempo"
+              }, 	
+           {
+                  label: "Componente",
+                  data: ["COMPONENTE-1","COMPONENTE-2"],
+                  position_cbo: 11,
+                  enable: "false",
+                  visible:"true",
+                  level: "Municipio",
+                  father_cbo: ""
+              },
+           {
+                  label: "Dimension",
+                  data: ["COMPONENTE-1:DIMENSION-1-1","COMPONENTE-1:DIMENSION-1-2","COMPONENTE-2:DIMENSION-2-1"],
+                  position_cbo: 12,
+                  enable: "false",
+                  visible:"true",
+                  level: "Municipio",
+                  father_cbo: "Componente"
+              }, 
+              {
+                  label: "SubDimension",
+                  data: ["DIMENSION-1-1:SUBDIMENSION-1-1-1","DIMENSION-1-2:SUBDIMENSION-1-2-1"],
+                  position_cbo: 13,
+                  enable: "false",
+                  visible:"true",
+                  level: "Municipio",
+                  father_cbo: "Dimension"
+              },
+           {
+                  label: "Indicador",
+                  data: ["SUBDIMENSION-1-1-1:(1)-NÚMERO DE VIVENDAS POR TIPO DE VIVIENDA, SEGÚN  DEPARTAMENTO, PROVINCIA Y MunicipioICIPIO, CNPV 2012", "SUBDIMENSION-1-2-1:(2)NUMERO DE VIVIENDAS  CON POBLACION  DE 1 AÑO DE EDAD POR TIPO DE VIVIENDA, SEGÚN  DEPARTAMENTO, PROVINCIA Y MunicipioICIPIO,CNPV 2012"],
+                  position_cbo: 14,
+                  enable: "true",
+                  visible:"true",
+                  level: "Municipio",
+                  father_cbo: "SubDimension"
+              },
+           {
+                  label: "Estado",
+                  data: ["(1):ACTIVO","(2):ACTIVO"],
+                  position_cbo: 15,
+                  enable: "false",
+                  visible:"true",
+                  level: "Municipio",
+                  father_cbo: "Indicador"
+              },
+           {
+                  label: "RURAL URBANO",
+                  data: ["(1):AMBOS","(2):AMBOS"],
+                  position_cbo: 16,
+                  enable: "false",
+                  visible:"true",
+                  level: "Municipio",
+                  father_cbo: "Indicador"
+              }, {
+                  label: "ES MIGRANTE",
+                  data: ["(1):NO","(2):NO"],
+                  position_cbo: 17,
+                  enable: "false",
+                  visible:"false",
+                  level: "Municipio",
+                  father_cbo: "Indicador"
+              }         
+             ]};
+      
+                console.log("===**+**====");     
+               // console.log(typeof wsExterno) ; // object 
+               // console.log(wsExterno);
+                console.log(typeof results) ; 
+                console.log(results);
+             // results.push(wsExterno);
+          
+             return  res.status(200).send(results);    // res.json({ success: true, email: req.query.nroDoc });
+            } else {
+               return res.status(403).send({ success: false, msg: 'Unauthorized.' });
+           }
+           }catch (error) {
+             console.log("===2====");
+            // console.log((res.json({error:error.message})));
+             return res.json({error:error.message});
+            }
+      
+          });
+
 
     const wsExternos = async (param1,param2) => {
         var respBodyMinPub= {};
