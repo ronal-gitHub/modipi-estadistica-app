@@ -23,11 +23,13 @@ router.post('/signup', function (req, res) {
             .create({
                 login: req.body.username,
                 password_hash: req.body.password,
-                nombres: '', //req.body.nombres,
-                apellidos: '', //req.body.apellidos,
-                email: '', //req.body.email,
+                nombres: req.body.nombres,
+                apellidos: req.body.apellidos,
+                email: req.body.email,
                 reset_key: 'false' , //req.body.reset_key,
-                puesto_id: 0  // req.body.puesto_id
+                puesto_id: req.body.puesto_id,
+                reset_key: 'false' ,
+                transaccion: 'CREAR'
             })
             .then((user) => res.status(201).send(user))
             .catch((error) => {
@@ -72,10 +74,12 @@ router.post('/signin', function (req, res) {
 
 router.get  ('/indicador', async function (req, res)   {
   try { //  The variable that received the HTTP data had to use the await keyword to ensure the asynchronous data was received before continuing
-   // var token = getToken(req.headers);
- console.log(req.headers);
+    var token = getToken(req.headers);
+    console.log(token);//  req.headers
+      // Verify the token using jwt.verify method
+    const decode =   jwt.verify(token, 'nodeauthsecret'); // and which expires 300 seconds after issue
 
-     if (true) {
+     if (token) {
       // Verify the token using jwt.verify method
     //  const decode =   jwt.verify(token, 'nodeauthsecret');
 
@@ -132,20 +136,17 @@ router.get  ('/indicador', async function (req, res)   {
          return res.status(403).send({ success: false, msg: 'Unauthorized.' });
      }
      }catch (error) {
+       // if (error instanceof jwt.JsonWebTokenError) {
+			// if the error thrown is because the JWT is unauthorized, return a 401 error
+			//return res.status(401).end()
+		//}
        console.log("===2====");
       // console.log((res.json({error:error.message})));
        return res.json({error:error.message});
       }
 
     });
-    //    const numero_doc = results.map(elm => elm.numero_doc);
-      // const resultsMap = new Map();
-     //  results.forEach(message => resultsMap.set(results.numero_doc, message));
 
-      /*this.body = messages.map(function(user) {
-       const obj = user.toJSON();
-       obj.recentMessage = messagesMap.get(obj.id);
-       return obj;*/
 
        router.get  ('/paramsCboVisible', async function (req, res)   {
         try { //  The variable that received the HTTP data had to use the await keyword to ensure the asynchronous data was received before continuing
